@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 
 const generateTokens = (numberOfWinners, entries) => {
     const winningNumbers = getWinningNumbers(numberOfWinners, entries);
@@ -16,20 +15,14 @@ const generateTokens = (numberOfWinners, entries) => {
                     Math.floor(Date.now() / 1000) +
                     process.env.EXPIRATION_IN_MINUTES * 60,
             },
-            process.env.SIGNING_KEY
+            process.env.SIGNING_KEY,
         );
         tokens.push(token);
     }
-
-    fs.writeFile('tokens.txt', tokens.join('\n'), (err) => {
-        if (err) {
-            console.error(err);
-        }
-    });
     return tokens;
 };
 
-const verifyToken = (token) => {
+const verifyToken = token => {
     try {
         const decoded = jwt.verify(token, process.env.SIGNING_KEY);
         return { error: null, decoded };
