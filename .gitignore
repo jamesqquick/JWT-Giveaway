@@ -1,0 +1,9 @@
+# testing
+coverage
+
+# editor
+.vscode
+
+# dependencies
+.cache
+node_modules

@@ -1,0 +1,20 @@
+{
+    "name": "jwt-giveaway",
+    "version": "0.0.1",
+    "description": "Program for doing giveaways with JSON Web Tokens",
+    "main": "./src/index.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "keywords": [
+        "json web tokens",
+        "jwt",
+        "jwt giveaway"
+    ],
+    "author": "James Q Quick",
+    "license": "MIT",
+    "dependencies": {
+        "jest": "^26.6.3",
+        "jsonwebtoken": "^8.5.1"
+    }
+}
