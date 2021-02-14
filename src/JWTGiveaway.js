@@ -32,7 +32,7 @@ module.exports = class Giveaway {
         } else {
             returnMsg = `${username} IS A WINNER!!`;
         }
-        return { err: errMsg, data: { msg: returnMsg } };
+        return { err: errorMsg, data: { msg: returnMsg } };
     }
 
     enter(username) {
