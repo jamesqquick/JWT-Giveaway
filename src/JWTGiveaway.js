@@ -8,7 +8,7 @@ module.exports = class Giveaway {
         this.acceptingEntries = false;
     }
 
-    start(client) {
+    start() {
         this.entries.clear();
         this.acceptingEntries = true;
         return { err: null, data: { msg: 'The giveaway has started' } };
