@@ -1,49 +1,59 @@
-const { generateTokens, verifyToken } = require('./TokenGenerator');
+const { generateTokens } = require('./TokenGenerator');
 const { TokenExpiredError } = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = class Giveaway {
-    constructor(numWinners) {
+    constructor(numWinners, signingKey) {
         this.numWinners = numWinners;
         this.entries = new Set();
-        this.acceptingEntries = false;
+        this.isOpen = false;
         this.giveawayEnded = false;
+        this.signingKey = signingKey;
     }
 
     start() {
         this.entries.clear();
-        this.acceptingEntries = true;
+        this.isOpen = true;
         this.giveawayEnded = false;
         return { err: null, data: { msg: 'The giveaway has started' } };
     }
 
     checkForWinner(username, token) {
-        if (!this.giveawayEnded || this.acceptingEntries) {
+        if (!this.giveawayEnded || this.isOpen) {
             return { err: `It's not the right time to submit your token.` };
         }
 
-        const { error, decoded } = verifyToken(token);
-        let errorMsg, returnMsg;
-        if (error) {
-            if (error instanceof TokenExpiredError) {
-                errorMsg = `${username}, you can't fool me. THAT TOKEN IS EXPIRED!!`;
-            } else {
-                errorMsg = `${username}, you can't fool me. THAT TOKEN ISN'T VALID`;
+        try {
+            let decoded = jwt.verify(token, this.signingkey);
+            if (decoded.data.username !== username) {
+                return {
+                    err: `Sorry, ${username}. That token doesn't match your username. Did you steal it?`,
+                };
+            } else if (!decoded.data.winner) {
+                return {
+                    err: `Sorry, ${username}. That's not a winner`,
+                };
             }
-        } else if (decoded.data.username !== username) {
-            errorMsg = `${username}, you must have stolen someone else's token`;
-        } else if (!decoded.data.winner) {
-            errorMsg = `${username},that's not a winner`;
-        } else {
-            returnMsg = `${username} IS A WINNER!!`;
+
+            return {
+                err: null,
+                data: { msg: `${username} is a WINNER!` },
+            };
+        } catch (error) {
+            console.error(error);
+            if (error instanceof TokenExpiredError) {
+                return { err: `Sorry, ${username}. That token is expired.` };
+            } else {
+                return { err: `Sorry, ${username}. That token isn't valid.` };
+            }
         }
-        return { err: errorMsg, data: { msg: returnMsg } };
     }
 
     enter(username) {
-        if (!this.acceptingEntries) {
+        if (!this.isOpen) {
             return {
                 err:
-                    'Sorry, you cannot enter unless the giveaway has been started.',
+                    'Sorry, you cannot enter while the giveaway is not running.',
             };
         }
         this.entries.add(username);
@@ -51,10 +61,9 @@ module.exports = class Giveaway {
     }
 
     stop() {
-        if (!this.acceptingEntries)
-            return { err: 'The giveaway never started' };
+        if (!this.isOpen) return { err: 'The giveaway never started' };
 
-        this.acceptingEntries = false;
+        this.isOpen = false;
         const entriesArray = [...this.entries];
         const tokens = generateTokens(this.numWinners, entriesArray);
         const userToTokenMap = {};
