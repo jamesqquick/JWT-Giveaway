@@ -6,17 +6,21 @@ module.exports = class Giveaway {
         this.numWinners = numWinners;
         this.entries = new Set();
         this.acceptingEntries = false;
+        this.giveawayEnded = false;
     }
 
     start() {
         this.entries.clear();
         this.acceptingEntries = true;
+        this.giveawayEnded = false;
         return { err: null, data: { msg: 'The giveaway has started' } };
     }
 
     checkForWinner(username, token) {
-        if (this.acceptingEntries)
-            return { err: 'Not currently accepting entries.' };
+        if (!this.giveawayEnded || this.acceptingEntries) {
+            return { err: `It's not the right time to submit your token.` };
+        }
+
         const { error, decoded } = verifyToken(token);
         let errorMsg, returnMsg;
         if (error) {
@@ -54,6 +58,7 @@ module.exports = class Giveaway {
         entriesArray.forEach((entry, i) => {
             userToTokenMap[entry] = tokens[i];
         });
+        this.giveawayEnded = true;
         return {
             err: null,
             data: { userToTokenMap, msg: 'Tokens generated successfully' },
