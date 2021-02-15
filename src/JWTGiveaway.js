@@ -65,7 +65,11 @@ module.exports = class Giveaway {
 
         this.isOpen = false;
         const entriesArray = [...this.entries];
-        const tokens = generateTokens(this.numWinners, entriesArray);
+        const tokens = generateTokens(
+            this.numWinners,
+            entriesArray,
+            this.signingKey,
+        );
         const userToTokenMap = {};
         entriesArray.forEach((entry, i) => {
             userToTokenMap[entry] = tokens[i];

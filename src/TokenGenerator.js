@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const generateTokens = (numberOfWinners, entries) => {
+const generateTokens = (numberOfWinners, entries, signingKey) => {
     const winningNumbers = getWinningNumbers(numberOfWinners, entries);
     const tokens = [];
     for (let i = 0; i < entries.length; i++) {
