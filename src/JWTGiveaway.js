@@ -51,6 +51,9 @@ module.exports = class Giveaway {
     }
 
     stop() {
+        if (!this.acceptingEntries)
+            return { err: 'The giveaway never started' };
+
         this.acceptingEntries = false;
         const entriesArray = [...this.entries];
         const tokens = generateTokens(this.numWinners, entriesArray);
