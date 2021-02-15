@@ -24,7 +24,7 @@ module.exports = class Giveaway {
         }
 
         try {
-            let decoded = jwt.verify(token, this.signingkey);
+            let decoded = jwt.verify(token, this.signingKey);
             if (decoded.data.username !== username) {
                 return {
                     err: `Sorry, ${username}. That token doesn't match your username. Did you steal it?`,
